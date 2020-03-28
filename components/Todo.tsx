@@ -1,39 +1,46 @@
 import React, { useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
-import uuid from "uuid";
 import TodoList from "./TodoList";
+import TodoService, { TodoItemType } from "../services/TodoService";
 
-export type Todo = {
-  id: number | string;
-  title: string;
-  isComplete: boolean;
-};
+const initialTodos = [
+  TodoService.newTodo("text"),
+  TodoService.newTodo("some text"),
+  TodoService.newTodo("text 3")
+];
 
 type Props = {};
 
 const Todo: React.FC<Props> = () => {
-  const [todoItems, setTodoItems] = useState<Todo[]>([
-    { id: 1, title: "Задача 1", isComplete: false },
-    { id: 2, title: "Задача 2", isComplete: false },
-    { id: 3, title: "Задача 3", isComplete: false }
-  ]);
+  const [todoItems, setTodoItems] = useState<TodoItemType[]>(initialTodos);
   const [value, setValue] = useState("");
 
   const changeTextHandler = (text: string) => setValue(text);
 
   const addTodoHandler = () => {
     if (value.length > 0) {
-      setTodoItems(prev => [
-        ...prev,
-        { id: uuid(), isComplete: false, title: value }
-      ]);
+      setTodoItems(prev => TodoService.addTodo(prev, value));
       setValue("");
     }
   };
 
+  const setCompleteHandler = (id: string) => {
+    setTodoItems(prev =>
+      TodoService.updateTodo(prev, { id, isComplete: true })
+    );
+  };
+
+  const removeTodoHandler = (id: string) => {
+    setTodoItems(prev => TodoService.deleteTodo(prev, id));
+  };
+
   return (
     <>
-      <TodoList todoItems={todoItems} />
+      <TodoList
+        todoItems={todoItems}
+        onComplete={setCompleteHandler}
+        onRemove={removeTodoHandler}
+      />
       <TextInput
         style={styles.textInput}
         value={value}

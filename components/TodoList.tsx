@@ -1,18 +1,25 @@
 import React from "react";
-import { FlatList, StyleSheet, ScrollView } from "react-native";
+import { FlatList } from "react-native";
 import TodoItem from "./TodoItem";
-import { Todo } from "./Todo";
+import { TodoItemType } from "../services/TodoService";
 
 type Props = {
-  todoItems: Todo[];
+  todoItems: TodoItemType[];
+  onComplete: (id: string) => void;
+  onRemove: (id: string) => void;
 };
 
-const TodoList: React.FC<Props> = ({ todoItems }) => {
+const TodoList: React.FC<Props> = ({ todoItems, onComplete, onRemove }) => {
   return (
     <FlatList
       data={todoItems}
-      renderItem={({ item: { isComplete, title } }) => (
-        <TodoItem title={title} isComplete={isComplete} />
+      renderItem={({ item: { isComplete, title, id } }) => (
+        <TodoItem
+          title={title}
+          isComplete={isComplete}
+          onComplete={() => onComplete(id)}
+          onRemove={() => onRemove(id)}
+        />
       )}
       keyExtractor={({ id }) => id.toString()}
     />
